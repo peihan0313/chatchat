@@ -2,11 +2,18 @@
 html
   head
     title|singIn
+    link(rel="stylesheet", href="../css/signIn.css")
   body
-    
-    form(action="/signIn" method="post")
-      input(type="text" name = "nickName")
-      input(type = 'submit' name = "signIn_submit" value = "登入")
+    div( id = 'main')
+      div(id = 'signup')
+        form(action="/signUp" method="post" )
+          input(type="text" name = "nickName" style = 'font-size:30px;')
+          input(type = 'submit' name = "signIn_submit" value = "註冊" style = 'font-size:30px;')
+          p(style = 'color:red;') #{upinfo}    
+        form(action="/signIn" method="post" )
+          input(type="text" name = "nickName" style = 'font-size:30px;')
+          input(type = 'submit' name = "signIn_submit" value = "登入" style = 'font-size:30px;')
+          p(style = 'color:red;') #{ininfo}
 script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
 
 

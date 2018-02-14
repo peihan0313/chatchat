@@ -8,9 +8,9 @@ var session = require('express-session')
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-    host: 'aws url',
-    user: 'username',
-    password: 'password',
+    host: 'url',
+    user: 'user',
+    password: 'psw',
     database: 'db',
 })
 
@@ -32,7 +32,6 @@ function dbopen(sSQL) {
     return new Promise(function (resolve, reject) {
         connection.query(sSQL, function (err, rows, fields) {
             if (err) throw err
-            console.log(rows)
             resolve(rows)
         })
     })
@@ -75,33 +74,53 @@ app.post('/signIn', async function (req, res) {
         res.render("chat.pug", {
             nickName: req.session.nickName,
         })
-    }else{
-        res.render('signIn.pug',{
-            ininfo:'無此帳號'
+    } else {
+        res.render('signIn.pug', {
+            ininfo: '無此帳號'
         })
     }
 
+})
+app.post('/loadmsg', async function (req, res) {
+    var time = apis.getTime_Str()
+    
+    if (req.body.inputtime) {
+        time =req.body.inputtime
+        console.log(`time = ${time}`)
+    }
+        var dbresult = await dbopen(`select c.message ,c.inputtime ,u.name from chat_message c ,user u where c.id = u.id and inputtime < '${time}' order by inputtime DESC Limit 30`)
+        console.log(dbresult.length)
+    res.send(dbresult)
 })
 
 
 io.on('connection', function (socket) {
     var date = apis.getTime_Str()
-    console.log(`[${date}]a user come in!`)
+    console.log(`[${new Date(date)}]a user come in!`)
 
-    socket.on('welcome chat', function (nickName) {
-        socket['nickName'] = nickName
-        io.sockets.emit('chat message', `${socket.nickName} comming...`)
+    socket.on('welcome chat', async function (nickName) {
+        var dbresult = await dbopen(`SELECT * FROM user Where name ='${nickName}'`)
+        socket['nickName'] = dbresult[0].name
+        socket['db_id'] = dbresult[0].id
+        var msg = `comming...`
+        var inputtime = apis.getTime_Str()
+        await dbopen(`INSERT INTO chat_message (message,inputtime,id) VALUES ('${msg}','${inputtime}','${socket.db_id}')`)
+        io.sockets.emit('chat message', `${socket.nickName} ${msg}`)
     })
 
-    socket.on('chat message', function (msg) {
+    socket.on('chat message', async function (msg) {
+        var inputtime = apis.getTime_Str()
+        await dbopen(`INSERT INTO chat_message (message,inputtime,id) VALUES ('${msg}','${inputtime}','${socket.db_id}')`)
         console.log(`${socket.nickName} : ${msg}`)
         io.sockets.emit('chat message', `${socket.nickName} : ${msg}`)
     })
 
-    socket.on('disconnect', function () {
-        var date = apis.getTime_Str()
-        console.log(`[${date}]a user offline!`)
-        io.sockets.emit('chat message', `${socket.nickName} leave....`)
+    socket.on('disconnect', async function () {
+        var inputtime = apis.getTime_Str()
+        console.log(`[${new Date(inputtime)}]${socket.nickName} user offline!`)
+        var msg = `leave....`
+        await dbopen(`INSERT INTO chat_message (message,inputtime,id) VALUES ('${msg}','${inputtime}','${socket.db_id}')`)
+        io.sockets.emit('chat message', `${socket.nickName} ${msg}`)
     })
 })
 

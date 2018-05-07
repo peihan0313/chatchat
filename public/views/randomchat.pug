@@ -27,32 +27,35 @@ script(src="/socket.io/socket.io.js")
 script.
   var start_msg = ''
   $( function () {
-    $.post('./loadmsg',{},function(result){
-      console.log(result)
-      for(var i=0;i<result.length;i++){
-        if(i == (result.length -1) ){
-          start_msg = result[i].inputtime
-        }
-        var msg = `${result[i].name} : ${result[i].message}`
-        $('#messages')[0].prepend($('<li>').text(msg)[0])
-      }
-    })
-    $('#main').scroll(function(){
-      if($('#main').scrollTop()==0){
-        $.post('/loadmsg',{inputtime : start_msg},function(result){
-          console.log(result)
-          for(var i=0;i<result.length;i++){
-            if(i == (result.length -1) ){
-              start_msg = result[i].inputtime
-            }
-            var msg = `${result[i].name} : ${result[i].message}`
-            $('#messages')[0].prepend($('<li>').text(msg)[0])
-          }
-        })
-      }
-    })
-
-    var socket = io('/general');
+    //- $.post('./loadmsg',{},function(result){
+    //-   console.log(result)
+    //-   for(var i=0;i<result.length;i++){
+    //-     if(i == (result.length -1) ){
+    //-       start_msg = result[i].inputtime
+    //-     }
+    //-     var msg = `${result[i].name} : ${result[i].message}`
+    //-     $('#messages')[0].prepend($('<li>').text(msg)[0])
+    //-   }
+    //- })
+    //- $('#main').scroll(function(){
+    //-   if($('#main').scrollTop()==0){
+    //-     $.post('/loadmsg',{inputtime : start_msg},function(result){
+    //-       console.log(result)
+    //-       for(var i=0;i<result.length;i++){
+    //-         if(i == (result.length -1) ){
+    //-           start_msg = result[i].inputtime
+    //-         }
+    //-         var msg = `${result[i].name} : ${result[i].message}`
+    //-         $('#messages')[0].prepend($('<li>').text(msg)[0])
+    //-       }
+    //-     })
+    //-   }
+    //- })
+    if(#{random}){
+      var socket = io('#{nsp}');
+    }else{
+      var socket = io();
+    }
     socket.emit('welcome chat','#{nickName}')
     $('form').submit(function(){
       if($('#m')[0].value.trim() != ""){      

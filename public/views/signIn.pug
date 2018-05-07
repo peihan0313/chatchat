@@ -14,8 +14,11 @@ html
           input(type="text" name = "nickName" style = 'font-size:30px;')
           input(type = 'submit' name = "signIn_submit" value = "登入" style = 'font-size:30px;')
           p(style = 'color:red;') #{ininfo}
+        form(action = "/randomChat" method = "post" onsubmit = 'return checkroom()')
+          input(type = "submit" name = "randomChat_submit" value = "隨機" style = 'font-size:30px;')
 script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
-
+script.
+  
 
     
 
